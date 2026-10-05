@@ -19,6 +19,9 @@ export type PokeApiPokemonDetail = {
     slot: number;
     type: { name: string };
   }>;
+  sprites: {
+    front_default: string | null;
+  };
 };
 
 @Injectable()

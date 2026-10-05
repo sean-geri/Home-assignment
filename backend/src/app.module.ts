@@ -7,6 +7,7 @@ import { PokemonModule } from './pokemon/pokemon.module.js';
 import { Pokemon } from './pokemon/pokemon.entity.js';
 import { TrainerModule } from './trainer/trainer.module.js';
 import { Trainer } from './trainer/trainer.entity.js';
+import { TrainerPokemon } from './trainer/trainer-pokemon.entity.js';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { Trainer } from './trainer/trainer.entity.js';
         username: configService.get<string>('DB_USER'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
-        entities: [Pokemon, Trainer],
+        entities: [Pokemon, Trainer, TrainerPokemon],
         synchronize: true,
       }),
     }),

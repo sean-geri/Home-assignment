@@ -77,6 +77,7 @@ export class PokemonSyncService implements OnApplicationBootstrap {
             type2: sortedTypes[1]?.type.name ?? null,
             weight: detail.weight,
             height: detail.height,
+            imageUrl: detail.sprites?.front_default ?? null,
           });
         }
 

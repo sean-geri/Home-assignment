@@ -19,4 +19,7 @@ export class Pokemon {
 
   @Column()
   height: number;
+
+  @Column({ type: 'varchar', nullable: true })
+  imageUrl: string | null;
 }
