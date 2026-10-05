@@ -4,6 +4,7 @@ import type {
   Pokemon,
   Trainer,
   TrainerPokemon,
+  TrainerPokemonLocation,
 } from './types';
 
 const BASE_URL = 'http://localhost:3008';
@@ -49,4 +50,24 @@ export function assignPokemonToTrainer(
     method: 'POST',
     body: JSON.stringify(input),
   });
+}
+
+export function getTrainerPokemon(
+  trainerId: number,
+): Promise<TrainerPokemon[]> {
+  return request<TrainerPokemon[]>(`/trainers/${trainerId}/pokemon`);
+}
+
+export function updateTrainerPokemonLocation(
+  trainerId: number,
+  id: number,
+  location: TrainerPokemonLocation,
+): Promise<TrainerPokemon> {
+  return request<TrainerPokemon>(
+    `/trainers/${trainerId}/pokemon/${id}/location`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ location }),
+    },
+  );
 }

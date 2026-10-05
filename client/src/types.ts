@@ -30,12 +30,14 @@ export type AssignPokemonInput = {
   gender: Gender;
 };
 
+export type TrainerPokemonLocation = 'BANK' | 'BAG';
+
 export type TrainerPokemon = {
   id: number;
   nickname: string;
   level: number;
   gender: Gender;
-  location: string;
+  location: TrainerPokemonLocation;
   pokemon: {
     id: number;
     name: string;

@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
+import { PokemonBag } from './components/PokemonBag'
+import { PokemonBank } from './components/PokemonBank'
 import { addPokemonToBank } from './operations/addPokemonToBank'
 import { createTrainer } from './operations/createTrainer'
+import { loadTrainerPokemon } from './operations/loadTrainerPokemon'
 import { loadTrainers } from './operations/loadTrainers'
 import { searchPokemon } from './operations/searchPokemon'
-import type { Gender, Pokemon, Trainer } from './types'
+import { updatePokemonLocation } from './operations/updatePokemonLocation'
+import type { Gender, Pokemon, Trainer, TrainerPokemon } from './types'
 import './App.css'
 
 function formatPokemonLabel(pokemon: Pokemon): string {
@@ -32,7 +36,12 @@ function App() {
   const [pokemonGender, setPokemonGender] = useState<Gender>('MALE')
   const [addingPokemon, setAddingPokemon] = useState(false)
 
+  const [trainerPokemon, setTrainerPokemon] = useState<TrainerPokemon[]>([])
+  const [movingId, setMovingId] = useState<number | null>(null)
+
   const hasTrainerSelected = selectedTrainerId !== ''
+  const bankPokemon = trainerPokemon.filter((item) => item.location === 'BANK')
+  const bagPokemon = trainerPokemon.filter((item) => item.location === 'BAG')
 
   useEffect(() => {
     void (async () => {
@@ -44,6 +53,32 @@ function App() {
       }
     })()
   }, [])
+
+  useEffect(() => {
+    if (selectedTrainerId === '') {
+      setTrainerPokemon([])
+      return
+    }
+
+    void (async () => {
+      try {
+        const loaded = await loadTrainerPokemon(selectedTrainerId)
+        setTrainerPokemon(loaded)
+      } catch (err) {
+        setTrainerPokemon([])
+        setError(
+          err instanceof Error
+            ? err.message
+            : 'Failed to load trainer Pokemon',
+        )
+      }
+    })()
+  }, [selectedTrainerId])
+
+  async function refreshTrainerPokemon(trainerId: number) {
+    const loaded = await loadTrainerPokemon(trainerId)
+    setTrainerPokemon(loaded)
+  }
 
   async function handleCreateTrainer(event: FormEvent) {
     event.preventDefault()
@@ -108,6 +143,7 @@ function App() {
       setNickname('')
       setLevel('')
       setPokemonGender('MALE')
+      await refreshTrainerPokemon(selectedTrainerId)
       setSuccess(
         `Added "${result.nickname}" to ${result.location} for the selected trainer`,
       )
@@ -115,6 +151,42 @@ function App() {
       setError(err instanceof Error ? err.message : 'Failed to add Pokemon')
     } finally {
       setAddingPokemon(false)
+    }
+  }
+
+  async function handleMoveToBag(id: number) {
+    if (!hasTrainerSelected) return
+
+    setError(null)
+    setSuccess(null)
+    setMovingId(id)
+
+    try {
+      await updatePokemonLocation(selectedTrainerId, id, 'BAG')
+      await refreshTrainerPokemon(selectedTrainerId)
+      setSuccess('Pokemon moved to bag')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to move Pokemon')
+    } finally {
+      setMovingId(null)
+    }
+  }
+
+  async function handleRemoveFromBag(id: number) {
+    if (!hasTrainerSelected) return
+
+    setError(null)
+    setSuccess(null)
+    setMovingId(id)
+
+    try {
+      await updatePokemonLocation(selectedTrainerId, id, 'BANK')
+      await refreshTrainerPokemon(selectedTrainerId)
+      setSuccess('Pokemon moved back to bank')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to move Pokemon')
+    } finally {
+      setMovingId(null)
     }
   }
 
@@ -315,6 +387,21 @@ function App() {
           </button>
         </form>
       </section>
+
+      {hasTrainerSelected && (
+        <>
+          <PokemonBank
+            items={bankPokemon}
+            onMoveToBag={handleMoveToBag}
+            movingId={movingId}
+          />
+          <PokemonBag
+            items={bagPokemon}
+            onRemoveFromBag={handleRemoveFromBag}
+            movingId={movingId}
+          />
+        </>
+      )}
     </div>
   )
 }
