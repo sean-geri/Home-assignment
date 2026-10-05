@@ -200,7 +200,7 @@ function App() {
       {error && <p className="banner error">{error}</p>}
       {success && <p className="banner success">{success}</p>}
 
-      <section className="section">
+      <section className="section trainers-card">
         <h2>Trainers</h2>
         <label className="field">
           <span>Select trainer</span>
@@ -219,12 +219,10 @@ function App() {
             ))}
           </select>
         </label>
-      </section>
 
-      <section className="section">
-        <h2>Add trainer</h2>
-        <form className="form" onSubmit={handleCreateTrainer}>
-          <label className="field">
+        <h3 className="subsection-title">Add trainer</h3>
+        <form className="form form-inline" onSubmit={handleCreateTrainer}>
+          <label className="field field-grow">
             <span>Name</span>
             <input
               type="text"
@@ -234,7 +232,7 @@ function App() {
             />
           </label>
 
-          <label className="field">
+          <label className="field field-age">
             <span>Age</span>
             <input
               type="number"
@@ -245,7 +243,7 @@ function App() {
             />
           </label>
 
-          <fieldset className="gender-field">
+          <fieldset className="gender-field gender-field-inline">
             <legend>Gender</legend>
             <label className="radio">
               <input
@@ -267,141 +265,152 @@ function App() {
             </label>
           </fieldset>
 
-          <button type="submit" className="btn" disabled={creatingTrainer}>
+          <button
+            type="submit"
+            className="btn btn-inline"
+            disabled={creatingTrainer}
+          >
             {creatingTrainer ? 'Adding…' : 'Add trainer'}
           </button>
         </form>
       </section>
 
-      <section className={`section ${hasTrainerSelected ? '' : 'disabled'}`}>
-        <h2>Find Pokemon & add to Bank</h2>
-        {!hasTrainerSelected && (
-          <p className="hint">Select a trainer to enable this section.</p>
-        )}
+      <div className="main-row">
+        <div className="main-col">
+          <section className={`section ${hasTrainerSelected ? '' : 'disabled'}`}>
+            <h2>Find Pokemon & add to Bank</h2>
+            {!hasTrainerSelected && (
+              <p className="hint">Select a trainer to enable this section.</p>
+            )}
 
-        <form className="form" onSubmit={handleSearchPokemon}>
-          <label className="field">
-            <span>Search Pokemon</span>
-            <div className="row">
-              <input
-                type="text"
-                value={pokemonQuery}
-                onChange={(event) => setPokemonQuery(event.target.value)}
-                disabled={!hasTrainerSelected}
-                required
-              />
+            <form className="form" onSubmit={handleSearchPokemon}>
+              <label className="field">
+                <span>Search Pokemon</span>
+                <div className="row">
+                  <input
+                    type="text"
+                    value={pokemonQuery}
+                    onChange={(event) => setPokemonQuery(event.target.value)}
+                    disabled={!hasTrainerSelected}
+                    required
+                  />
+                  <button
+                    type="submit"
+                    className="btn secondary"
+                    disabled={!hasTrainerSelected || searchingPokemon}
+                  >
+                    {searchingPokemon ? 'Searching…' : 'Search'}
+                  </button>
+                </div>
+              </label>
+            </form>
+
+            <form className="form" onSubmit={handleAddPokemonToBank}>
+              <label className="field">
+                <span>Results</span>
+                <select
+                  value={selectedPokemonId}
+                  onChange={(event) => {
+                    const value = event.target.value
+                    setSelectedPokemonId(value === '' ? '' : Number(value))
+                  }}
+                  disabled={!hasTrainerSelected || pokemonResults.length === 0}
+                  required
+                >
+                  <option value="">
+                    {pokemonResults.length === 0
+                      ? 'Search to load results'
+                      : 'Select a Pokemon'}
+                  </option>
+                  {pokemonResults.map((pokemon) => (
+                    <option key={pokemon.id} value={pokemon.id}>
+                      {formatPokemonLabel(pokemon)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="field">
+                <span>Nickname</span>
+                <input
+                  type="text"
+                  value={nickname}
+                  onChange={(event) => setNickname(event.target.value)}
+                  disabled={!hasTrainerSelected}
+                  required
+                />
+              </label>
+
+              <label className="field">
+                <span>Level</span>
+                <input
+                  type="number"
+                  min={1}
+                  max={100}
+                  value={level}
+                  onChange={(event) => setLevel(event.target.value)}
+                  disabled={!hasTrainerSelected}
+                  required
+                />
+              </label>
+
+              <fieldset className="gender-field" disabled={!hasTrainerSelected}>
+                <legend>Gender</legend>
+                <label className="radio">
+                  <input
+                    type="radio"
+                    name="pokemon-gender"
+                    checked={pokemonGender === 'MALE'}
+                    onChange={() => setPokemonGender('MALE')}
+                    disabled={!hasTrainerSelected}
+                  />
+                  <span>Male</span>
+                </label>
+                <label className="radio">
+                  <input
+                    type="radio"
+                    name="pokemon-gender"
+                    checked={pokemonGender === 'FEMALE'}
+                    onChange={() => setPokemonGender('FEMALE')}
+                    disabled={!hasTrainerSelected}
+                  />
+                  <span>Female</span>
+                </label>
+              </fieldset>
+
               <button
                 type="submit"
-                className="btn secondary"
-                disabled={!hasTrainerSelected || searchingPokemon}
+                className="btn"
+                disabled={
+                  !hasTrainerSelected ||
+                  selectedPokemonId === '' ||
+                  addingPokemon
+                }
               >
-                {searchingPokemon ? 'Searching…' : 'Search'}
+                {addingPokemon ? 'Adding…' : 'Add to Bank'}
               </button>
-            </div>
-          </label>
-        </form>
+            </form>
+          </section>
 
-        <form className="form" onSubmit={handleAddPokemonToBank}>
-          <label className="field">
-            <span>Results</span>
-            <select
-              value={selectedPokemonId}
-              onChange={(event) => {
-                const value = event.target.value
-                setSelectedPokemonId(value === '' ? '' : Number(value))
-              }}
-              disabled={!hasTrainerSelected || pokemonResults.length === 0}
-              required
-            >
-              <option value="">
-                {pokemonResults.length === 0
-                  ? 'Search to load results'
-                  : 'Select a Pokemon'}
-              </option>
-              {pokemonResults.map((pokemon) => (
-                <option key={pokemon.id} value={pokemon.id}>
-                  {formatPokemonLabel(pokemon)}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="field">
-            <span>Nickname</span>
-            <input
-              type="text"
-              value={nickname}
-              onChange={(event) => setNickname(event.target.value)}
-              disabled={!hasTrainerSelected}
-              required
+          {hasTrainerSelected && (
+            <PokemonBank
+              items={bankPokemon}
+              onMoveToBag={handleMoveToBag}
+              movingId={movingId}
             />
-          </label>
+          )}
+        </div>
 
-          <label className="field">
-            <span>Level</span>
-            <input
-              type="number"
-              min={1}
-              max={100}
-              value={level}
-              onChange={(event) => setLevel(event.target.value)}
-              disabled={!hasTrainerSelected}
-              required
+        <div className="main-col">
+          {hasTrainerSelected && (
+            <PokemonBag
+              items={bagPokemon}
+              onRemoveFromBag={handleRemoveFromBag}
+              movingId={movingId}
             />
-          </label>
-
-          <fieldset className="gender-field" disabled={!hasTrainerSelected}>
-            <legend>Gender</legend>
-            <label className="radio">
-              <input
-                type="radio"
-                name="pokemon-gender"
-                checked={pokemonGender === 'MALE'}
-                onChange={() => setPokemonGender('MALE')}
-                disabled={!hasTrainerSelected}
-              />
-              <span>Male</span>
-            </label>
-            <label className="radio">
-              <input
-                type="radio"
-                name="pokemon-gender"
-                checked={pokemonGender === 'FEMALE'}
-                onChange={() => setPokemonGender('FEMALE')}
-                disabled={!hasTrainerSelected}
-              />
-              <span>Female</span>
-            </label>
-          </fieldset>
-
-          <button
-            type="submit"
-            className="btn"
-            disabled={
-              !hasTrainerSelected ||
-              selectedPokemonId === '' ||
-              addingPokemon
-            }
-          >
-            {addingPokemon ? 'Adding…' : 'Add to Bank'}
-          </button>
-        </form>
-      </section>
-
-      {hasTrainerSelected && (
-        <>
-          <PokemonBank
-            items={bankPokemon}
-            onMoveToBag={handleMoveToBag}
-            movingId={movingId}
-          />
-          <PokemonBag
-            items={bagPokemon}
-            onRemoveFromBag={handleRemoveFromBag}
-            movingId={movingId}
-          />
-        </>
-      )}
+          )}
+        </div>
+      </div>
     </div>
   )
 }

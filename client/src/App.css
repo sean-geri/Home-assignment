@@ -3,6 +3,28 @@
   flex-direction: column;
   gap: 28px;
   text-align: left;
+  width: 100%;
+}
+
+.main-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  align-items: start;
+  width: 100%;
+}
+
+.main-col {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .main-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 .app-header p {
@@ -51,6 +73,13 @@
   gap: 14px;
 }
 
+.form-inline {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+}
+
 .field {
   display: flex;
   flex-direction: column;
@@ -60,6 +89,28 @@
 .field > span {
   font-size: 0.85rem;
   color: var(--muted);
+}
+
+.field-grow {
+  flex: 1 1 140px;
+  min-width: 120px;
+}
+
+.field-age {
+  flex: 0 0 88px;
+}
+
+.trainers-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.subsection-title {
+  margin: 4px 0 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-h);
 }
 
 .row {
@@ -111,6 +162,19 @@ select:disabled {
   padding: 0;
   margin-bottom: 6px;
   width: 100%;
+}
+
+.gender-field-inline {
+  flex: 0 0 auto;
+}
+
+.gender-field-inline legend {
+  margin-bottom: 8px;
+}
+
+.btn-inline {
+  align-self: flex-end;
+  white-space: nowrap;
 }
 
 .radio {
